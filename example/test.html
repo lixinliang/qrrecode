@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">
+    <title> test </title>
+    <style type="text/css">
+        canvas {
+            width: 128px;
+            height: 128px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body ontouchstart="">
+
+    <canvas width="128" height="128"></canvas>
+
+    <script type="text/javascript" src="./qrcode.min.js"></script>
+    <script type="text/javascript" src="../qrrecode.min.js"></script>
+    <script type="text/javascript">
+        function s4 () {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
+        function uuid () {
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+        }
+        function QRCodeCanvas () {
+            var div = document.createElement('div');
+            new QRCode(div, {
+                text: uuid(),
+                width: 128,
+                height: 128,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M,
+            });
+            return div.querySelector('canvas');
+        }
+        var canvas = document.querySelector('canvas');
+        var context = canvas.getContext('2d');
+        var qrcode = QRCodeCanvas();
+        context.drawImage(qrcode, 0, 0, 128, 128);
+        canvas.addEventListener('click', function () {
+            var qrcode = QRCodeCanvas();
+            QRRecode(canvas, qrcode, {
+                type : 'smooth-fade',
+                duration : 800,
+            });
+        }, false);
+    </script>
+
+</body>
+</html>
