@@ -1,34 +1,58 @@
+/**
+ * Create a transition animation when reload a new qrcode
+ * @param  {HTMLCanvasElement} backgroundCanvas The original canvas and it will be redrawed
+ * @param  {HTMLCanvasElement} foregroundCanvas The new canvas with the new qrcode
+ * @param  {Object} options Including animation specific options
+ * @return {Promise} Resolved when animation done
+ */
 export default function ( backgroundCanvas, foregroundCanvas, options ) {
 
+    /**
+     * Arguments type checking
+     */
     if (!(backgroundCanvas instanceof HTMLCanvasElement)) {
         return Promise.resolve();
     }
-
     if (!(foregroundCanvas instanceof HTMLCanvasElement)) {
         return Promise.resolve();
     }
 
+    /**
+     * @type {Number} backgroundWidth, backgroundHeight, foregroundWidth, foregroundHeight, destinationWidth, destinationHeight
+     */
     const { width : backgroundWidth, height : backgroundHeight } = backgroundCanvas;
     const { width : foregroundWidth, height : foregroundHeight } = foregroundCanvas;
 
     const destinationWidth = backgroundWidth;
     const destinationHeight = backgroundHeight;
 
+    /**
+     * @type {HTMLCanvasElement} destinationCanvas Point to backgroundCanvas
+     */
     const destinationCanvas = backgroundCanvas;
     const destinationContext = destinationCanvas.getContext('2d');
 
+    /**
+     * clear destinationCanvas
+     */
+    function clear () {
+        destinationContext.clearRect(0, 0, destinationWidth, destinationHeight);
+    }
+
     {
+        /**
+         * @type {HTMLCanvasElement} backgroundCanvas Clone of destinationCanvas
+         */
         const backgroundCanvas = document.createElement('canvas');
         backgroundCanvas.getContext('2d').drawImage(
             destinationCanvas,
             0, 0, destinationWidth, destinationHeight,
         );
 
-        function clear () {
-            destinationContext.clearRect(0, 0, destinationWidth, destinationHeight);
-        }
-
         if (!options) {
+            /**
+             * No animation without options
+             */
             clear();
             destinationContext.drawImage(
                 foregroundCanvas,
@@ -66,10 +90,29 @@ export default function ( backgroundCanvas, foregroundCanvas, options ) {
                 return;
             }
 
-            if (type == 'firework') {
+            if (type == 'smooth-blur') {
+                destinationContext.filter = `blur(${ (1 - Math.abs(percentage * 2 - 1)) * 5 }px)`;
+                destinationContext.globalAlpha = 1 - percentage;
+                destinationContext.drawImage(
+                    backgroundCanvas,
+                    0, 0, backgroundWidth, backgroundHeight,
+                    0, 0, destinationWidth, destinationHeight,
+                );
+                destinationContext.globalAlpha = percentage;
+                destinationContext.drawImage(
+                    foregroundCanvas,
+                    0, 0, foregroundWidth, foregroundHeight,
+                    0, 0, destinationWidth, destinationHeight,
+                );
+                destinationContext.globalAlpha = 1;
+                destinationContext.filter = '';
+                return;
+            }
+
+            if (type == 'test') {
                 // todo
 
-                if (-1 == size) {
+                if (size == -1) {
                     size = 0;
                     function getPixelSize ( canvas ) {
                         const context = canvas.getContext('2d');
@@ -80,7 +123,7 @@ export default function ( backgroundCanvas, foregroundCanvas, options ) {
                             const color = [];
                             [].push.apply(color, data);
                             const [ r, g, b ] = color;
-                            if (255 === r && r === g && g === b) {
+                            if (r === g && g === b && b === 255) {
                                 return size;
                             }
                             size++;
@@ -107,12 +150,12 @@ export default function ( backgroundCanvas, foregroundCanvas, options ) {
                                 size * x, size * y, size, size,
                                 size * (x + dx * percentage), size * (y + dy * percentage), size, size,
                             );
-                            // destinationContext.globalAlpha = percentage;
-                            // destinationContext.drawImage(
-                            //     foregroundCanvas,
-                            //     size * x, size * y, size, size,
-                            //     size * x, size * y, size, size,
-                            // );
+                            destinationContext.globalAlpha = percentage;
+                            destinationContext.drawImage(
+                                foregroundCanvas,
+                                size * x, size * y, size, size,
+                                size * x, size * y, size, size,
+                            );
                             destinationContext.globalAlpha = 1;
                         }
                     }
@@ -120,6 +163,11 @@ export default function ( backgroundCanvas, foregroundCanvas, options ) {
 
                 return;
             }
+
+            // Waiting for your pull requests
+            // if (type == 'any good animation idea') {
+            // your code
+            // }
 
             destinationContext.drawImage(
                 foregroundCanvas,
