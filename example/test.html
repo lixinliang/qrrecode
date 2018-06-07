@@ -2,8 +2,8 @@
 <html lang="zh-cmn-Hans">
 <head>
     <meta charset="UTF-8">
-    <meta id="viewport" name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">
-    <title> test </title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, viewport-fit=cover">
+    <title> QRRecode </title>
     <style type="text/css">
         canvas {
             width: 128px;
@@ -43,10 +43,27 @@
         context.drawImage(qrcode, 0, 0, 128, 128);
         canvas.addEventListener('click', function () {
             var qrcode = QRCodeCanvas();
-            QRRecode(canvas, qrcode, {
+
+            var options;
+
+            options = {
                 type : 'smooth-fade',
-                duration : 800,
-            });
+                duration : 600,
+                callback : function ( percentage ) {
+                    console.log(percentage);
+                },
+            };
+
+            options = {
+                type : 'smooth-blur',
+                duration : 400,
+                blur : 3,
+                callback : function ( percentage ) {
+                    console.log(percentage);
+                },
+            };
+
+            QRRecode(canvas, qrcode, options);
         }, false);
     </script>
 
