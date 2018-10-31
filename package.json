@@ -1,7 +1,7 @@
 {
   "name": "qrrecode",
   "version": "1.0.0",
-  "description": "(<1kb) Create a transition animation when reload a new qrcode.",
+  "description": "(<3kb) Create a transition animation when reload a new qrcode.",
   "main": "qrrecode.min.js",
   "scripts": {
     "build": "rollup -c",
